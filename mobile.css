@@ -540,3 +540,14 @@ body.mobile-page {
     font-size: 12px;
   }
 }
+/* 精灵图仍在下载时，让静态图轻微晃动，提示已经响应点击。 */
+@keyframes mascot-waiting {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  25%      { transform: translateY(-3px) rotate(-1.4deg); }
+  75%      { transform: translateY(2px) rotate(1.4deg); }
+}
+
+.mascot-wrap.is-waiting .mascot-poster {
+  visibility: visible;
+  animation: mascot-waiting .7s ease-in-out infinite;
+}

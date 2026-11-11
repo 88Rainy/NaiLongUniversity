@@ -3,7 +3,7 @@
 
   const TARGET_URL = 'https://www.fjsmu.edu.cn';
   const TOTAL_DURATION_MS = 10_000;
-  const ASSET_VERSION = '20261111f';
+  const ASSET_VERSION = '20261111g';
 
   const digit = document.getElementById('countdownDigit');
   const countdownLabel = document.getElementById('countdownLabel');
@@ -250,19 +250,26 @@
   // 精灵图 1952×1952：8 列 × 8 行，每格 244px；59 帧内容位于每格左上角 240×240。
   // 不使用 GIF、动态 WebP、Canvas 或 CSS animation，避开微信只显示第一帧的问题。
   if (mascotWrap && mascotFrames) {
-    const CONTENT_SIZE = 240;
-    const FRAME_PITCH = 244;
-    const SPRITE_COLUMNS = 8;
-    const FRAME_COUNT = 59;
     const FRAME_DURATION_MS = 100;
     const MIN_SURFACE_PX = 20;
     const MAX_SPRITE_ATTEMPTS = 3;
     const MAX_SIZE_RETRIES = 40;
 
+    // 优先使用体积很小的 WebP 精灵图（约 93KB，30 帧），失败时回退原 PNG。
+    const SPRITE_CANDIDATES = [
+      { url: 'assets/mascot-sprite-30.webp?v=' + ASSET_VERSION, frameCount: 30, columns: 8, pitch: 244, content: 240 },
+      { url: 'assets/mascot-sprite.png?v=' + ASSET_VERSION, frameCount: 59, columns: 8, pitch: 244, content: 240 }
+    ];
+
     let sprite = null;
     let spriteReady = false;
     let spriteUrl = '';
-    let spriteAttempt = 0;
+    let spriteCandidateIndex = 0;
+    let spriteAttempts = 0;
+    let frameCount = SPRITE_CANDIDATES[0].frameCount;
+    let spriteColumns = SPRITE_CANDIDATES[0].columns;
+    let framePitch = SPRITE_CANDIDATES[0].pitch;
+    let contentSize = SPRITE_CANDIDATES[0].content;
 
     let playbackRequested = false;
     let framesStarted = false;
@@ -289,8 +296,8 @@
       // 布局可能还没完成（图片未加载、字体未就绪），此时先不画，交给重试逻辑。
       if (!measureSurface()) return false;
 
-      const scaleX = surfaceWidth / CONTENT_SIZE;
-      const scaleY = surfaceHeight / CONTENT_SIZE;
+      const scaleX = surfaceWidth / contentSize;
+      const scaleY = surfaceHeight / contentSize;
       mascotFrames.style.backgroundSize =
         `${sprite.naturalWidth * scaleX}px ${sprite.naturalHeight * scaleY}px`;
       mascotFrames.style.backgroundImage = `url("${spriteUrl}")`;
@@ -303,13 +310,13 @@
       if (frameIndex === drawnFrame) return;
       if (surfaceWidth < MIN_SURFACE_PX || surfaceHeight < MIN_SURFACE_PX) return;
 
-      const column = frameIndex % SPRITE_COLUMNS;
-      const row = Math.floor(frameIndex / SPRITE_COLUMNS);
-      const scaleX = surfaceWidth / CONTENT_SIZE;
-      const scaleY = surfaceHeight / CONTENT_SIZE;
+      const column = frameIndex % spriteColumns;
+      const row = Math.floor(frameIndex / spriteColumns);
+      const scaleX = surfaceWidth / contentSize;
+      const scaleY = surfaceHeight / contentSize;
 
       mascotFrames.style.backgroundPosition =
-        `${-column * FRAME_PITCH * scaleX}px ${-row * FRAME_PITCH * scaleY}px`;
+        `${-column * framePitch * scaleX}px ${-row * framePitch * scaleY}px`;
       drawnFrame = frameIndex;
       lastDrawAt = performance.now();
     }
@@ -317,7 +324,7 @@
     function tickFrame() {
       if (!framesStarted) return;
       const elapsed = performance.now() - frameStartedAt;
-      drawFrame(Math.floor(elapsed / FRAME_DURATION_MS) % FRAME_COUNT);
+      drawFrame(Math.floor(elapsed / FRAME_DURATION_MS) % frameCount);
     }
 
     function rafLoop() {
@@ -359,6 +366,7 @@
       frameStartedAt = performance.now() - frameElapsedMs;
       drawnFrame = -1;
       tickFrame();
+      mascotWrap.classList.remove('is-waiting');
       mascotWrap.classList.add('is-frames-playing');
       startTickers();
     }
@@ -367,6 +375,7 @@
       playbackRequested = true;
 
       if (!spriteReady) {
+        mascotWrap.classList.add('is-waiting');
         if (!sprite) loadSprite();
         return;
       }
@@ -384,6 +393,7 @@
     function resumeSpriteFrames() {
       if (!playbackRequested || framesStarted) return;
       if (!spriteReady) {
+        mascotWrap.classList.add('is-waiting');
         if (!sprite) loadSprite();
         return;
       }
@@ -411,30 +421,43 @@
     }
 
     function loadSprite() {
-      if (spriteAttempt >= MAX_SPRITE_ATTEMPTS) return;
-      spriteAttempt += 1;
+      if (spriteCandidateIndex >= SPRITE_CANDIDATES.length) return;
 
-      const candidate =
-        'assets/mascot-sprite.png?v=' + ASSET_VERSION +
-        (spriteAttempt > 1 ? '&r=' + spriteAttempt : '');
+      const candidate = SPRITE_CANDIDATES[spriteCandidateIndex];
+      spriteAttempts += 1;
+      const attempt = spriteAttempts;
+      const url = candidate.url + (attempt > 1 ? '&r=' + attempt : '');
+
       const image = new Image();
       image.decoding = 'async';
 
       image.onload = () => {
         sprite = image;
-        spriteUrl = candidate;
+        spriteUrl = url;
         spriteReady = true;
+        frameCount = candidate.frameCount;
+        spriteColumns = candidate.columns;
+        framePitch = candidate.pitch;
+        contentSize = candidate.content;
+        mascotWrap.classList.remove('is-waiting');
         if (playbackRequested) startSpriteFrames();
       };
       image.onerror = () => {
         sprite = null;
         // 弱网下首次下载失败很常见，换一个 URL 参数重试，绕开失败缓存。
-        window.setTimeout(() => {
-          if (!spriteReady) loadSprite();
-        }, 500 * spriteAttempt);
+        if (attempt < MAX_SPRITE_ATTEMPTS) {
+          window.setTimeout(() => {
+            if (!spriteReady) loadSprite();
+          }, 400 * attempt);
+          return;
+        }
+        // 多格式兜底：不支持 WebP 的旧内核自动改用 PNG。
+        spriteCandidateIndex += 1;
+        spriteAttempts = 0;
+        if (spriteCandidateIndex < SPRITE_CANDIDATES.length) loadSprite();
       };
 
-      image.src = candidate;
+      image.src = url;
     }
 
     // 页面一打开就开始下载并解码精灵图，点击时才能立刻出画面。

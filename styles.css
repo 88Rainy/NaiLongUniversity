@@ -435,3 +435,15 @@ body.experience-started .mascot-play-hint {
 /* 第一帧精灵图就位后才隐藏静态图，避免点击瞬间闪白。 */
 .mascot-wrap.is-frames-playing .mascot-poster { visibility: hidden; }
 .mascot-wrap.is-frames-playing .mascot-frames { display: block; }
+
+/* 精灵图仍在下载时，让静态图轻微晃动，提示已经响应点击。 */
+@keyframes mascot-waiting {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  25%      { transform: translateY(-3px) rotate(-1.4deg); }
+  75%      { transform: translateY(2px) rotate(1.4deg); }
+}
+
+.mascot-wrap.is-waiting .mascot-poster {
+  visibility: visible;
+  animation: mascot-waiting .7s ease-in-out infinite;
+}
