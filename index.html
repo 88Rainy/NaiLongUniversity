@@ -6,11 +6,27 @@
   <meta name="theme-color" content="#f4f1e8" />
   <meta name="description" content="奶龙正在大笑，倒计时结束后自动跳转。" />
   <title>三明学院</title>
+  <script>
+    // 手机访问 index 时进入独立移动页；电脑端保持当前桌面页面。
+    // 手机需要查看桌面版时可访问 index.html?desktop=1。
+    (function () {
+      if (/[?&]desktop=1(?:&|$)/.test(window.location.search)) return;
+
+      var ua = navigator.userAgent || '';
+      var mobileUA = /Android|iPhone|iPad|iPod|Mobile|HarmonyOS/i.test(ua);
+      var iPadDesktopUA = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+      var touchPhone = window.matchMedia('(pointer: coarse)').matches && window.innerWidth <= 820;
+
+      if (mobileUA || iPadDesktopUA || touchPhone) {
+        window.location.replace('mobile.html' + window.location.search + window.location.hash);
+      }
+    })();
+  </script>
   <script>window.__nailongPageOpenedAt = performance.now();</script>
-  <link rel="preload" href="assets/mascot-sprite.png?v=20261111b" as="image" type="image/png" />
+  <link rel="preload" href="assets/mascot-sprite.png?v=20261111d" as="image" type="image/png" />
   <link rel="preload" href="assets/nailong-edge-transparent.png" as="image" type="image/png" />
-  <link rel="stylesheet" href="styles.css?v=20261111b" />
-  <script src="script.js?v=20261111b" defer></script>
+  <link rel="stylesheet" href="styles.css?v=20261111d" />
+  <script src="script.js?v=20261111d" defer></script>
 </head>
 <body class="grad-028">
   <main class="page-shell">
@@ -27,9 +43,13 @@
           height="240"
           draggable="false"
         />
-        <div class="mascot-anim" id="mascotAnim" aria-hidden="true">
-          <div class="mascot-sprite"></div>
-        </div>
+        <canvas
+          class="mascot-canvas"
+          id="mascotCanvas"
+          width="240"
+          height="240"
+          aria-hidden="true"
+        ></canvas>
       </div>
 
       <div class="countdown-card" id="countdownCard" aria-label="10 秒倒计时">

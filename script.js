@@ -137,12 +137,100 @@
     laughAudio.pause();
   }, { once: true });
 
-  // 中间奶龙动画：用 CSS 精灵图逐帧播放，不依赖浏览器对动图的解码支持。
-  // 精灵图加载成功后才切换；失败时保留静态兜底图（mascot-laugh-poster.png）。
+  // 中间奶龙动画：用 Canvas 主动逐帧绘制 PNG 精灵图。
+  // 这样不依赖 GIF/动态 WebP 解码，也不依赖手机浏览器是否执行 CSS animation。
   const mascotWrap = document.getElementById('mascotWrap');
-  const spriteProbe = new Image();
-  spriteProbe.onload = () => {
-    if (mascotWrap) mascotWrap.classList.add('is-animated');
-  };
-  spriteProbe.src = 'assets/mascot-sprite.png?v=20261111b';
+  const mascotCanvas = document.getElementById('mascotCanvas');
+  const mascotContext = mascotCanvas
+    ? mascotCanvas.getContext('2d', { alpha: true })
+    : null;
+
+  if (mascotWrap && mascotCanvas && mascotContext) {
+    const SPRITE_URL = 'assets/mascot-sprite.png?v=20261111d';
+    const FRAME_SIZE = 240;
+    const FRAME_PITCH = 244; // 240px 画面 + 左右各 2px 透明间隔
+    const SPRITE_GUTTER = 2;
+    const SPRITE_COLUMNS = 8;
+    const FRAME_COUNT = 59;
+    const FRAME_DURATION_MS = 100;
+
+    const mascotSprite = new Image();
+    let mascotStarted = false;
+    let mascotFrame = 0;
+    let mascotDrawnFrame = -1;
+    let mascotStartedAt = 0;
+    let mascotRafId = 0;
+
+    function resizeMascotCanvas() {
+      const rect = mascotWrap.getBoundingClientRect();
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+      const size = Math.max(1, Math.round(rect.width * pixelRatio));
+
+      if (mascotCanvas.width === size && mascotCanvas.height === size) return;
+
+      mascotCanvas.width = size;
+      mascotCanvas.height = size;
+      mascotContext.imageSmoothingEnabled = true;
+      mascotDrawnFrame = -1;
+
+      if (mascotStarted) drawMascotFrame(mascotFrame);
+    }
+
+    function drawMascotFrame(frameIndex) {
+      const column = frameIndex % SPRITE_COLUMNS;
+      const row = Math.floor(frameIndex / SPRITE_COLUMNS);
+      const sourceX = SPRITE_GUTTER + column * FRAME_PITCH;
+      const sourceY = SPRITE_GUTTER + row * FRAME_PITCH;
+
+      mascotContext.clearRect(0, 0, mascotCanvas.width, mascotCanvas.height);
+      mascotContext.drawImage(
+        mascotSprite,
+        sourceX,
+        sourceY,
+        FRAME_SIZE,
+        FRAME_SIZE,
+        0,
+        0,
+        mascotCanvas.width,
+        mascotCanvas.height
+      );
+      mascotDrawnFrame = frameIndex;
+    }
+
+    function animateMascot(timestamp) {
+      if (!mascotStarted) return;
+
+      if (!mascotStartedAt) mascotStartedAt = timestamp;
+      mascotFrame = Math.floor((timestamp - mascotStartedAt) / FRAME_DURATION_MS) % FRAME_COUNT;
+
+      if (mascotFrame !== mascotDrawnFrame) drawMascotFrame(mascotFrame);
+      mascotRafId = window.requestAnimationFrame(animateMascot);
+    }
+
+    function startMascotAnimation() {
+      if (mascotStarted) return;
+
+      resizeMascotCanvas();
+      drawMascotFrame(0);
+      mascotStarted = true;
+      mascotWrap.classList.add('is-animated');
+      mascotRafId = window.requestAnimationFrame(animateMascot);
+    }
+
+    mascotSprite.onload = startMascotAnimation;
+    mascotSprite.onerror = () => {
+      // 精灵图加载失败时保留静态兜底图。
+      mascotWrap.classList.remove('is-animated');
+    };
+    mascotSprite.src = SPRITE_URL;
+
+    window.addEventListener('resize', () => {
+      if (mascotStarted) resizeMascotCanvas();
+    }, { passive: true });
+
+    window.addEventListener('pagehide', () => {
+      mascotStarted = false;
+      window.cancelAnimationFrame(mascotRafId);
+    }, { once: true });
+  }
 })();

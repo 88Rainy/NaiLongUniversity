@@ -377,103 +377,19 @@ body.grad-028::before {
   .edge-mascot__pose { transform: none; }
 }
 
-/* ===== 中间奶龙：CSS 精灵图逐帧播放 =====
-   不再依赖浏览器对动图（GIF / 动态 WebP）的解码能力：
-   只用一张 PNG 精灵图 + CSS 关键帧，所有手机浏览器、微信内置浏览器都能播。 */
-.mascot-anim {
+/* ===== 中间奶龙：Canvas 逐帧绘制 =====
+   雪碧图只负责提供 59 帧画面；动画由 JavaScript 每 100ms 主动重绘，
+   不依赖 GIF/动态 WebP 解码，也不依赖 CSS animation 是否被手机浏览器执行。 */
+.mascot-canvas {
   position: absolute;
   inset: 0;
   display: none;
-  overflow: hidden;
-  filter: drop-shadow(0 16px 13px rgba(56, 63, 48, .12));
+  width: 100%;
+  height: 100%;
   pointer-events: none;
+  filter: drop-shadow(0 16px 13px rgba(56, 63, 48, .12));
 }
+
+/* 第一帧成功绘制后才隐藏静态图，避免切换时闪空白。 */
 .mascot-wrap.is-animated .mascot { visibility: hidden; }
-.mascot-wrap.is-animated .mascot-anim { display: block; }
-
-.mascot-sprite {
-  position: absolute;
-  /* 雪碧图为 1952x1952：8 列/行，每格 240px + 左右各 2px 透明间隔，步距 244px。 */
-  /* 裁掉透明间隔，并把 240px 画面精确对齐到显示框。 */
-  top: -0.833333%;
-  left: -0.833333%;
-  width: 813.333333%;
-  height: 813.333333%;
-  background-image: url("assets/mascot-sprite.png?v=20261111b");
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
-  transform: translate3d(0, 0, 0);
-  animation: mascot-laugh 5.9s steps(1, end) infinite;
-  will-change: transform;
-}
-
-/* 59 帧，每帧100ms，8x8 网格；每帧占 1/59 时长 */
-@keyframes mascot-laugh {
-  0.00000% { transform: translate3d(0.0000%, 0.0000%, 0); }
-  1.69492% { transform: translate3d(-12.5000%, 0.0000%, 0); }
-  3.38983% { transform: translate3d(-25.0000%, 0.0000%, 0); }
-  5.08475% { transform: translate3d(-37.5000%, 0.0000%, 0); }
-  6.77966% { transform: translate3d(-50.0000%, 0.0000%, 0); }
-  8.47458% { transform: translate3d(-62.5000%, 0.0000%, 0); }
-  10.16949% { transform: translate3d(-75.0000%, 0.0000%, 0); }
-  11.86441% { transform: translate3d(-87.5000%, 0.0000%, 0); }
-  13.55932% { transform: translate3d(0.0000%, -12.5000%, 0); }
-  15.25424% { transform: translate3d(-12.5000%, -12.5000%, 0); }
-  16.94915% { transform: translate3d(-25.0000%, -12.5000%, 0); }
-  18.64407% { transform: translate3d(-37.5000%, -12.5000%, 0); }
-  20.33898% { transform: translate3d(-50.0000%, -12.5000%, 0); }
-  22.03390% { transform: translate3d(-62.5000%, -12.5000%, 0); }
-  23.72881% { transform: translate3d(-75.0000%, -12.5000%, 0); }
-  25.42373% { transform: translate3d(-87.5000%, -12.5000%, 0); }
-  27.11864% { transform: translate3d(0.0000%, -25.0000%, 0); }
-  28.81356% { transform: translate3d(-12.5000%, -25.0000%, 0); }
-  30.50847% { transform: translate3d(-25.0000%, -25.0000%, 0); }
-  32.20339% { transform: translate3d(-37.5000%, -25.0000%, 0); }
-  33.89831% { transform: translate3d(-50.0000%, -25.0000%, 0); }
-  35.59322% { transform: translate3d(-62.5000%, -25.0000%, 0); }
-  37.28814% { transform: translate3d(-75.0000%, -25.0000%, 0); }
-  38.98305% { transform: translate3d(-87.5000%, -25.0000%, 0); }
-  40.67797% { transform: translate3d(0.0000%, -37.5000%, 0); }
-  42.37288% { transform: translate3d(-12.5000%, -37.5000%, 0); }
-  44.06780% { transform: translate3d(-25.0000%, -37.5000%, 0); }
-  45.76271% { transform: translate3d(-37.5000%, -37.5000%, 0); }
-  47.45763% { transform: translate3d(-50.0000%, -37.5000%, 0); }
-  49.15254% { transform: translate3d(-62.5000%, -37.5000%, 0); }
-  50.84746% { transform: translate3d(-75.0000%, -37.5000%, 0); }
-  52.54237% { transform: translate3d(-87.5000%, -37.5000%, 0); }
-  54.23729% { transform: translate3d(0.0000%, -50.0000%, 0); }
-  55.93220% { transform: translate3d(-12.5000%, -50.0000%, 0); }
-  57.62712% { transform: translate3d(-25.0000%, -50.0000%, 0); }
-  59.32203% { transform: translate3d(-37.5000%, -50.0000%, 0); }
-  61.01695% { transform: translate3d(-50.0000%, -50.0000%, 0); }
-  62.71186% { transform: translate3d(-62.5000%, -50.0000%, 0); }
-  64.40678% { transform: translate3d(-75.0000%, -50.0000%, 0); }
-  66.10169% { transform: translate3d(-87.5000%, -50.0000%, 0); }
-  67.79661% { transform: translate3d(0.0000%, -62.5000%, 0); }
-  69.49153% { transform: translate3d(-12.5000%, -62.5000%, 0); }
-  71.18644% { transform: translate3d(-25.0000%, -62.5000%, 0); }
-  72.88136% { transform: translate3d(-37.5000%, -62.5000%, 0); }
-  74.57627% { transform: translate3d(-50.0000%, -62.5000%, 0); }
-  76.27119% { transform: translate3d(-62.5000%, -62.5000%, 0); }
-  77.96610% { transform: translate3d(-75.0000%, -62.5000%, 0); }
-  79.66102% { transform: translate3d(-87.5000%, -62.5000%, 0); }
-  81.35593% { transform: translate3d(0.0000%, -75.0000%, 0); }
-  83.05085% { transform: translate3d(-12.5000%, -75.0000%, 0); }
-  84.74576% { transform: translate3d(-25.0000%, -75.0000%, 0); }
-  86.44068% { transform: translate3d(-37.5000%, -75.0000%, 0); }
-  88.13559% { transform: translate3d(-50.0000%, -75.0000%, 0); }
-  89.83051% { transform: translate3d(-62.5000%, -75.0000%, 0); }
-  91.52542% { transform: translate3d(-75.0000%, -75.0000%, 0); }
-  93.22034% { transform: translate3d(-87.5000%, -75.0000%, 0); }
-  94.91525% { transform: translate3d(0.0000%, -87.5000%, 0); }
-  96.61017% { transform: translate3d(-12.5000%, -87.5000%, 0); }
-  98.30508% { transform: translate3d(-25.0000%, -87.5000%, 0); }
-}
-
-/* 奶龙是页面主体，即使开启了“减弱动态效果”也保留播放 */
-@media (prefers-reduced-motion: reduce) {
-  .mascot-sprite {
-    animation-duration: 5.9s !important;
-    animation-iteration-count: infinite !important;
-  }
-}
+.mascot-wrap.is-animated .mascot-canvas { display: block; }
