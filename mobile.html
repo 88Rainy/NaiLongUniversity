@@ -7,19 +7,19 @@
   <meta name="description" content="奶龙正在大笑，倒计时结束后自动跳转。" />
   <title>三明学院</title>
   <script>window.__nailongPageOpenedAt = performance.now();</script>
-  <link rel="preload" href="assets/mascot-sprite.png?v=20261111d" as="image" type="image/png" />
+  <link rel="preload" href="assets/mascot-sprite.png?v=20261111e" as="image" type="image/png" />
   <link rel="preload" href="assets/nailong-edge-transparent.png" as="image" type="image/png" />
-  <link rel="stylesheet" href="mobile.css?v=20261111d" />
-  <script src="mobile.js?v=20261111d" defer></script>
+  <link rel="stylesheet" href="mobile.css?v=20261111e" />
+  <script src="mobile.js?v=20261111e" defer></script>
 </head>
 <body class="grad-028 mobile-page">
   <main class="page-shell">
 <h1>&nbsp;&nbsp;欢迎来到福建奶龙学院官网！</h1>
     <h1>猜猜看10秒后会发生什么</h1> 
-    <section class="showcase" id="showcase" aria-label="奶龙大笑倒计时">
-      <div class="mascot-wrap" id="mascotWrap">
+    <section class="showcase" id="showcase" aria-label="点击奶龙开始 10 秒倒计时">
+      <div class="mascot-wrap" id="mascotWrap" role="button" tabindex="0" aria-label="点击奶龙开始播放声音、动画和倒计时">
         <img
-          class="mascot"
+          class="mascot mascot-poster"
           id="mascot"
           src="assets/mascot-laugh-poster.png"
           alt="正在捧腹大笑的奶龙"
@@ -27,17 +27,12 @@
           height="240"
           draggable="false"
         />
-        <canvas
-          class="mascot-canvas"
-          id="mascotCanvas"
-          width="240"
-          height="240"
-          aria-hidden="true"
-        ></canvas>
+        <div class="mascot-frames" id="mascotFrames" aria-hidden="true"></div>
+        <span class="mascot-play-hint" aria-hidden="true">👆 点击奶龙开始</span>
       </div>
 
       <div class="countdown-card" id="countdownCard" aria-label="10 秒倒计时">
-        <span class="countdown-label">倒计时</span>
+        <span class="countdown-label" id="countdownLabel">等待开始</span>
         <strong class="countdown-digit" id="countdownDigit" aria-live="assertive">10</strong>
         <span class="countdown-unit">秒</span>
         <div class="countdown-track" aria-hidden="true"><span id="countdownProgress"></span></div>
@@ -118,6 +113,6 @@
     <p class="noscript-note">请启用 JavaScript，或<a href="https://www.fjsmu.edu.cn">直接访问目标网站</a>。</p>
   </noscript>
 
-  <audio id="laughAudio" src="assets/nailong-laugh.mp3" preload="auto" autoplay loop playsinline></audio>
+  <audio id="laughAudio" src="assets/nailong-laugh.mp3" preload="auto" loop playsinline></audio>
 </body>
 </html>

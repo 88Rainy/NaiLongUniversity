@@ -377,22 +377,65 @@ body.grad-028::before {
   .edge-mascot__pose { transform: none; }
 }
 
-/* ===== 中间奶龙：Canvas 逐帧绘制 =====
-   雪碧图只负责提供 59 帧画面；动画由 JavaScript 每 100ms 主动重绘，
-   不依赖 GIF/动态 WebP 解码，也不依赖 CSS animation 是否被手机浏览器执行。 */
-.mascot-canvas {
+/* ===== 中间奶龙：点击后逐帧播放 PNG 精灵图 =====
+   精灵图为 8 列 × 8 行，每格 244px（59 帧）。JavaScript 每 100ms
+   修改 background-position，不依赖 GIF/动态 WebP/Canvas，
+   在微信内置浏览器中也能稳定逐帧播放。 */
+.mascot-wrap {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+}
+
+.mascot-wrap:focus-visible {
+  border-radius: 18px;
+  outline: 3px solid rgba(255, 255, 255, .9);
+  outline-offset: 6px;
+}
+
+.mascot-poster { transition: transform .15s ease; }
+.mascot-wrap:active .mascot-poster { transform: scale(.975); }
+
+.mascot-play-hint {
+  position: absolute;
+  z-index: 4;
+  top: calc(100% + 6px);
+  left: 50%;
+  padding: 5px 14px;
+  border-radius: 999px;
+  color: var(--ink);
+  background: rgba(255, 253, 247, .95);
+  box-shadow: 0 6px 18px rgba(20, 13, 45, .2);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translateX(-50%);
+  transition: opacity .2s ease, visibility .2s ease;
+}
+
+body.experience-started .mascot-play-hint {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.mascot-frames {
   position: absolute;
   inset: 0;
   display: none;
-  width: 100%;
-  height: 100%;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 800% 800%;
   pointer-events: none;
   filter: drop-shadow(0 16px 13px rgba(56, 63, 48, .12));
 }
 
-/* 第一帧成功绘制后才隐藏静态图，避免切换时闪空白。 */
-.mascot-wrap.is-animated .mascot { visibility: hidden; }
-.mascot-wrap.is-animated .mascot-canvas { display: block; }
+/* 第一帧精灵图就位后才隐藏静态图，避免点击瞬间闪白。 */
+.mascot-wrap.is-frames-playing .mascot-poster { visibility: hidden; }
+.mascot-wrap.is-frames-playing .mascot-frames { display: block; }
+
 
 /* ===== 独立手机页 mobile.html 的专用适配 ===== */
 html {
@@ -453,6 +496,12 @@ body.mobile-page {
 
 .mobile-page .edge-mascot {
   width: clamp(50px, 14vw, 74px);
+}
+
+.mobile-page .mascot-play-hint {
+  top: calc(100% + 2px);
+  padding: 4px 12px;
+  font-size: 12px;
 }
 /* 小屏/矮屏手机：收拢纵向间距，尽量让倒计时、奶龙和按钮都留在首屏。 */
 @media (max-width: 340px), (max-height: 560px) {
