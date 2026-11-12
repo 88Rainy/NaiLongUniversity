@@ -46,6 +46,19 @@ h1 {
   letter-spacing: .04em;
 }
 
+/* 音量提示：奶龙同款亮黄色高亮块，一眼可见。 */
+.volume-hint strong {
+  display: inline-block;
+  margin: 0 .06em;
+  padding: .04em .36em .14em;
+  border-radius: .42em;
+  color: #4a2a00;
+  background: linear-gradient(180deg, #ffe873, #ffb300);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, .72), 0 10px 22px rgba(255, 168, 0, .5);
+  text-shadow: none;
+  white-space: nowrap;
+}
+
 .showcase {
   position: relative;
   isolation: isolate;

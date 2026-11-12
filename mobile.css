@@ -461,11 +461,31 @@ body.mobile-page {
   white-space: nowrap;
 }
 
-.mobile-page h1:nth-of-type(2),
-.mobile-page h1:nth-of-type(3) {
+.mobile-page .warn-line {
   max-width: 100%;
   font-size: clamp(14px, 4.9vw, 20px);
   line-height: 1.3;
+  white-space: nowrap;
+}
+
+.mobile-page .volume-hint {
+  max-width: 100%;
+  margin-top: 2px;
+  font-size: clamp(15px, 5vw, 19px);
+  line-height: 1.8;
+  white-space: nowrap;
+}
+
+.mobile-page .volume-hint strong {
+  display: inline-block;
+  margin: 0 .06em;
+  padding: .06em .38em .16em;
+  border-radius: .44em;
+  color: #4a2a00;
+  background: linear-gradient(180deg, #ffe873, #ffb300);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, .8), 0 8px 20px rgba(255, 168, 0, .55);
+  font-weight: 900;
+  text-shadow: none;
   white-space: nowrap;
 }
 
@@ -542,11 +562,14 @@ body.mobile-page {
     padding-bottom: calc(12px + env(safe-area-inset-bottom));
   }
 
-  .mobile-page h1:nth-of-type(2),
-  .mobile-page h1:nth-of-type(3) {
+  .mobile-page .warn-line {
     font-size: clamp(12px, 4.6vw, 16px);
     line-height: 1.3;
     white-space: nowrap;
+  }
+
+  .mobile-page .volume-hint {
+    font-size: clamp(12px, 4.5vw, 15px);
   }
 
   .mobile-page .showcase {
