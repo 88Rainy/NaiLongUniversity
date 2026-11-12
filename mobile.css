@@ -488,6 +488,35 @@ body.mobile-page {
   gap: 8px;
 }
 
+/* 访客统计：手机端同样显示成居中的小胶囊。 */
+.mobile-page .visit-stats {
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 8px;
+  padding: 4px 10px;
+  border: 1px solid rgba(255, 255, 255, .22);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, .92);
+  background: rgba(28, 26, 79, .34);
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: .02em;
+}
+
+.mobile-page .visit-stats[hidden] { display: none; }
+
+.mobile-page .visit-stats strong {
+  color: #fff;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 2px rgba(24, 12, 60, .35);
+}
+
+.mobile-page .visit-stats__sep { opacity: .4; }
+
 .mobile-page .sound-button,
 .mobile-page .replay-button,
 .mobile-page .manual-link {
@@ -532,6 +561,11 @@ body.mobile-page {
 
   .mobile-page .page-actions {
     gap: 5px 10px;
+  }
+
+  .mobile-page .visit-stats {
+    margin-top: 6px;
+    font-size: 10.5px;
   }
 
   .mobile-page .sound-button,

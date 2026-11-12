@@ -151,6 +151,38 @@ h1 {
   gap: 12px 18px;
 }
 
+/* 访客统计：轻量地放在操作按钮下方，不抢倒计时的视觉重点。 */
+.visit-stats {
+  display: inline-flex;
+  min-height: 26px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 4px 12px;
+  border: 1px solid rgba(255, 255, 255, .22);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, .92);
+  background: rgba(28, 26, 79, .34);
+  font-size: 12.5px;
+  line-height: 1;
+  letter-spacing: .02em;
+  backdrop-filter: blur(6px);
+}
+
+.visit-stats strong {
+  color: #fff;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 2px rgba(24, 12, 60, .35);
+}
+
+.visit-stats__sep { opacity: .4; }
+
+.visit-stats[hidden] { display: none; }
+
+.visit-stats--offline { opacity: .55; }
+
 .manual-link {
   color: rgba(255, 255, 255, .88);
   font-size: 12px;

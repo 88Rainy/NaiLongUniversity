@@ -11,6 +11,7 @@
 - 左右两侧各有 6 只弹簧式弹出的奶龙；手机端会自动缩小。
 - 电脑访问使用 `index.html`，手机访问会自动进入独立适配页 `mobile.html`。
 - 手机需要查看桌面版时，可访问 `index.html?desktop=1`。
+- 页面底部显示「总访问量 / 访客」，每次打开页面自动 +1，电脑端和手机端合并计数。
 
 ## 中间奶龙的动画方案
 
@@ -44,6 +45,7 @@ nailong-countdown-four-edges/
 ├── mobile.html         # 手机端独立页面
 ├── mobile.css          # 手机端样式与安全区适配
 ├── mobile.js           # 手机端逻辑（与 script.js 相同）
+├── stats.js            # 访问量统计（Vercount）
 ├── README.md
 ├── make_sprite.py      # 由原始 WebP 生成 PNG 精灵图的脚本
 ├── photos/             # 制作精灵图时的中间产物
@@ -64,9 +66,27 @@ nailong-countdown-four-edges/
 - `TOTAL_DURATION_MS`：修改单轮时长，单位为毫秒；当前为 `10_000`，即 10 秒。
 - `FRAME_DURATION_MS`：修改动画每帧时长，当前为 `100` 毫秒。
 
+## 访问统计
+
+页面底部的「总访问量 / 访客」由免费开源的 [Vercount](https://vercount.one) 提供（不蒜子的替代方案），不需要注册就能开始计数：
+
+- 统计逻辑全部放在 `stats.js`，`index.html` 和 `mobile.html` 都引用它。
+- 电脑端、手机端共用同一个站点计数，每打开一次页面 +1。
+- 手机访问 `index.html` 会立刻跳到 `mobile.html`，跳转时 `index.html` 不再计数，避免一次访问被记成两次。
+- 脚本优先使用 `events.vercount.one`，失败时自动切换到国内线路 `cn.vercount.one`。
+- 9 秒内拿不到数据（例如被网络拦截）时，统计条显示「—」，奶龙动画、声音和倒计时都不受影响。
+
+### 查看后台数据
+
+1. 打开 <https://vercount.one>，用 GitHub 账号登录。
+2. 添加站点 `88rainy.github.io`，按后台提示完成验证。
+3. 验证通过后即可在后台查看总访问量、独立访客等走势。
+
+> `88rainy.github.io` 是 GitHub Pages 的二级域名，可能无法完成域名验证。即使后台添加不了站点，页面上的计数仍然正常工作。
+
 ## 部署与缓存
 
-页面给样式、脚本和 `mascot-sprite.png` 加了版本参数 `?v=20261111e`，用于绕过手机浏览器或 CDN 的旧缓存。
+页面给样式、脚本和 `mascot-sprite.png` 加了版本参数 `?v=20261112a`，用于绕过手机浏览器或 CDN 的旧缓存。
 
 更新部署时请确认以下文件一起上传：
 
@@ -76,6 +96,7 @@ nailong-countdown-four-edges/
 - `mobile.html`
 - `mobile.css`
 - `mobile.js`
+- `stats.js`
 - `assets/mascot-sprite.png`
 - `assets/mascot-laugh-poster.png`
 - `assets/nailong-edge-transparent.png`
